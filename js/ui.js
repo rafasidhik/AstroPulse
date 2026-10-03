@@ -119,12 +119,13 @@ export function updateAlerts(alerts) {
     alerts.forEach(alert => {
         const alertEl = document.createElement('div');
         alertEl.className = 'alert-item';
-        alertEl.style.padding = '0.75rem';
-        alertEl.style.marginBottom = '0.5rem';
-        alertEl.style.borderRadius = '6px';
+        alertEl.style.padding = '0.875rem 1rem';
+        alertEl.style.borderRadius = '8px';
+        alertEl.style.lineHeight = '1.5';
+        alertEl.style.wordWrap = 'break-word';
         alertEl.style.backgroundColor = alert.type === 'CRITICAL' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)';
         alertEl.style.border = `1px solid ${alert.type === 'CRITICAL' ? '#EF4444' : '#F59E0B'}`;
-        alertEl.innerHTML = `<strong>${alert.message}</strong><br><small style="color: var(--color-muted)">${alert.parameter}: ${alert.value}</small>`;
+        alertEl.innerHTML = `<strong>${alert.message}</strong>`;
         container.appendChild(alertEl);
     });
 }
