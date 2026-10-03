@@ -1,4 +1,3 @@
-// AstroPulse - Phase 3: Health Data Engine
 // Generates realistic simulated astronaut health data with smooth variation
 // All generated values are fictional simulation data, not medical measurements.
 
