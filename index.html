@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroPulse - AURORA-01</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="brand">
+            <h1>AstroPulse</h1>
+            <p class="mission-name">AURORA-01</p>
+        </div>
+
+        <div class="live-status" aria-label="Monitoring status">
+            <span class="status-indicator"></span>
+            <span>LIVE</span>
+        </div>
+    </header>
+
+    <!-- Mission / Astronaut Information -->
+    <section id="astronaut-info" aria-labelledby="astronaut-info-title">
+        <h2 id="astronaut-info-title">Astronaut Information</h2>
+        
+        <div class="info-grid">
+            <div class="info-item">
+                <strong>Astronaut:</strong> <span id="astronaut-name">Alex Morgan</span>
+            </div>
+            <div class="info-item">
+                <strong>Mission:</strong> <span id="mission-name-info">AURORA-01</span>
+            </div>
+            <div class="info-item">
+                <strong>Mission Day:</strong> <span id="mission-day">47</span>
+            </div>
+            <div class="info-item">
+                <strong>Monitoring:</strong> <span id="monitoring-status">LIVE</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Overall Health Status -->
+    <section id="overall-health" aria-labelledby="overall-health-title">
+        <h2 id="overall-health-title">Overall Health</h2>
+
+        <div id="overall-status">
+            <span class="status-indicator"></span>
+            <span class="status-text">NORMAL</span>
+        </div>
+    </section>
+
+    <!-- Health Parameter Cards -->
+    <section id="health-parameters" aria-labelledby="health-params-title">
+        <h2 id="health-params-title">Health Parameters</h2>
+        
+        <div class="cards-grid">
+            <!-- Heart Rate Card -->
+            <article class="health-card" aria-labelledby="heart-rate-title">
+                <div class="card-icon" aria-hidden="true">
+                    <img src="assets/astronaut.svg" alt="" style="width:24px; height:24px;">
+                </div>
+                <h3 id="heart-rate-title" class="card-title">Heart Rate</h3>
+                <div class="card-value">
+                    <span id="heart-rate-value">78</span> <span class="card-unit">BPM</span>
+                </div>
+                <div class="card-status">
+                    <span id="heart-rate-status">NORMAL</span>
+                </div>
+                <div class="card-updated">
+                    <small>Updated <span id="heart-rate-updated">5 sec ago</span></small>
+                </div>
+            </article>
+
+            <!-- Oxygen Saturation Card -->
+            <article class="health-card" aria-labelledby="oxygen-title">
+                <div class="card-icon" aria-hidden="true">
+                    <img src="assets/astronaut.svg" alt="" style="width:24px; height:24px;">
+                </div>
+                <h3 id="oxygen-title" class="card-title">Oxygen Saturation</h3>
+                <div class="card-value">
+                    <span id="oxygen-value">98</span> <span class="card-unit">%</span>
+                </div>
+                <div class="card-status">
+                    <span id="oxygen-status">NORMAL</span>
+                </div>
+                <div class="card-updated">
+                    <small>Updated <span id="oxygen-updated">5 sec ago</span></small>
+                </div>
+            </article>
+
+            <!-- Body Temperature Card -->
+            <article class="health-card" aria-labelledby="temperature-title">
+                <div class="card-icon" aria-hidden="true">
+                    <img src="assets/astronaut.svg" alt="" style="width:24px; height:24px;">
+                </div>
+                <h3 id="temperature-title" class="card-title">Body Temperature</h3>
+                <div class="card-value">
+                    <span id="temperature-value">36.7</span> <span class="card-unit">°C</span>
+                </div>
+                <div class="card-status">
+                    <span id="temperature-status">NORMAL</span>
+                </div>
+                <div class="card-updated">
+                    <small>Updated <span id="temperature-updated">5 sec ago</span></small>
+                </div>
+            </article>
+
+            <!-- Sleep Duration Card -->
+            <article class="health-card" aria-labelledby="sleep-title">
+                <div class="card-icon" aria-hidden="true">
+                    <img src="assets/astronaut.svg" alt="" style="width:24px; height:24px;">
+                </div>
+                <h3 id="sleep-title" class="card-title">Sleep Duration</h3>
+                <div class="card-value">
+                    <span id="sleep-value">7.5</span> <span class="card-unit">Hours</span>
+                </div>
+                <div class="card-status">
+                    <span id="sleep-status">NORMAL</span>
+                </div>
+                <div class="card-updated">
+                    <small>Updated <span id="sleep-updated">5 sec ago</span></small>
+                </div>
+            </article>
+
+            <!-- Exercise Time Card -->
+            <article class="health-card" aria-labelledby="exercise-title">
+                <div class="card-icon" aria-hidden="true">
+                    <img src="assets/astronaut.svg" alt="" style="width:24px; height:24px;">
+                </div>
+                <h3 id="exercise-title" class="card-title">Exercise Time</h3>
+                <div class="card-value">
+                    <span id="exercise-value">52</span> <span class="card-unit">Minutes</span>
+                </div>
+                <div class="card-status">
+                    <span id="exercise-status">NORMAL</span>
+                </div>
+                <div class="card-updated">
+                    <small>Updated <span id="exercise-updated">5 sec ago</span></small>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- Health History Section -->
+    <section id="health-history" aria-labelledby="health-history-title">
+        <h2 id="health-history-title">Health History</h2>
+
+        <div class="chart-header">
+            <h3>Heart Rate — Last 20 Readings</h3>
+        </div>
+
+        <div id="health-chart-container">
+            <canvas id="health-history-chart"></canvas>
+        </div>
+    </section>
+
+    <!-- Alerts Section -->
+    <section id="alerts-section" aria-labelledby="alerts-title">
+        <h2 id="alerts-title">Alerts</h2>
+
+        <div id="alerts-container">
+            <p id="no-alerts">No active alerts</p>
+        </div>
+    </section>
+
+    <!-- Mission Time -->
+    <section id="mission-info" aria-labelledby="mission-info-title">
+        <h2 id="mission-info-title">Mission Time</h2>
+        <div class="mission-time-display">
+            <p>Mission Day <span id="mission-day-display">47</span></p>
+            <p><span id="mission-time">14:32:18 UTC</span></p>
+        </div>
+    </section>
+
+    <!-- Simulation Controls -->
+    <section id="simulation-controls" aria-labelledby="simulation-controls-title">
+        <h2 id="simulation-controls-title">Simulation Controls</h2>
+
+        <div class="control-buttons">
+            <button type="button" id="normal-mode">
+                Normal
+            </button>
+
+            <button type="button" id="warning-mode">
+                Warning
+            </button>
+
+            <button type="button" id="critical-mode">
+                Critical
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p><strong>AstroPulse</strong></p>
+            <p>Simulation Dashboard</p>
+            <p><small>All health data is simulated.</small></p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Module References -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

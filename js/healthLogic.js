@@ -1,0 +1,1 @@
+// Phase 4: Health logic, thresholds, and alert processing will be implemented here.
