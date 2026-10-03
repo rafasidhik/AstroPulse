@@ -250,7 +250,13 @@ header {
     height: 48px;
     background-color: var(--color-secondary);
     border-radius: 10px;
+    color: var(--color-primary);
     margin-bottom: 0.5rem;
+}
+
+.card-icon svg {
+    width: 24px;
+    height: 24px;
 }
 
 .card-title {
@@ -343,6 +349,12 @@ header {
 .section-meta {
     color: var(--color-muted);
     font-size: 0.8125rem;
+}
+
+#overall-health .section-meta,
+#simulation-controls .section-meta {
+    margin-top: -0.75rem;
+    margin-bottom: var(--space-md);
 }
 
 .chart-param-select {
@@ -537,23 +549,65 @@ footer {
     background-color: var(--color-surface);
     border: 1px solid var(--color-secondary);
     border-radius: 12px;
-    padding: var(--space-lg) var(--space-xl);
-    text-align: center;
+    padding: var(--space-xl);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
 .footer-content {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+}
+
+.footer-brand {
+    display: flex;
     flex-direction: column;
     gap: 0.25rem;
 }
 
-.footer-content p {
-    color: var(--color-muted);
+.footer-brand strong {
+    color: var(--color-text);
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
 }
 
-.footer-content p strong {
-    color: var(--color-text);
+.footer-brand span {
+    color: var(--color-primary);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.footer-info {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+}
+
+.footer-info span:nth-child(even) {
+    opacity: 0.5;
+}
+
+.footer-bottom {
+    flex-basis: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-secondary);
+    text-align: center;
+}
+
+.footer-bottom p {
+    color: var(--color-muted);
+    font-size: 0.8125rem;
 }
 
 /* Responsive Design */
@@ -626,6 +680,21 @@ footer {
 
     .chart-param-select select {
         width: 100%;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .footer-brand {
+        align-items: center;
+    }
+
+    .footer-info {
+        justify-content: center;
+        text-align: center;
     }
 }
 
