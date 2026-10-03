@@ -150,14 +150,31 @@
 
         <!-- Health History Section -->
         <section id="health-history" aria-labelledby="health-history-title">
-            <h2 id="health-history-title">Health History</h2>
+            <div class="history-header">
+                <div class="history-heading">
+                    <h2 id="health-history-title">Health History</h2>
+                    <p class="section-meta">Last 20 readings &middot; Updated every 5 seconds</p>
+                </div>
+
+                <div class="chart-param-select">
+                    <label for="history-parameter">Parameter</label>
+                    <select id="history-parameter">
+                        <option value="heartRate" selected>Heart Rate</option>
+                        <option value="oxygen">Oxygen Saturation</option>
+                        <option value="temperature">Body Temperature</option>
+                        <option value="sleep">Sleep Duration</option>
+                        <option value="exercise">Exercise Time</option>
+                    </select>
+                </div>
+            </div>
 
             <div class="chart-header">
-                <h3>Heart Rate — Last 20 Readings</h3>
+                <h3 id="chart-title">Heart Rate — Last 20 Readings</h3>
             </div>
 
             <div id="health-chart-container">
-                <p style="color: var(--color-muted);">Chart container</p>
+                <canvas id="health-history-chart" role="img" aria-label="Health history chart"></canvas>
+                <p id="chart-empty" hidden>No historical readings available.</p>
             </div>
         </section>
 
@@ -207,6 +224,9 @@
             </div>
         </footer>
     </div>
+
+    <!-- Chart Library (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
     <!-- JavaScript Module References -->
     <script type="module" src="js/app.js"></script>

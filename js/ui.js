@@ -1,11 +1,27 @@
-// AstroPulse - Phase 4: UI Updates
+// AstroPulse - Phase 4/5: UI Updates
 // DOM manipulation and rendering for dashboard
 
-function formatTime(seconds) {
-    const hrs = Math.floor(seconds / 3600) % 24;
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')} UTC`;
+export const PARAMETER_META = {
+    heartRate: { label: 'Heart Rate', unit: 'BPM', color: '#38BDF8' },
+    oxygen: { label: 'Oxygen Saturation', unit: '%', color: '#22C55E' },
+    temperature: { label: 'Body Temperature', unit: '°C', color: '#F59E0B' },
+    sleep: { label: 'Sleep Duration', unit: 'hours', color: '#A78BFA' },
+    exercise: { label: 'Exercise Time', unit: 'minutes', color: '#F472B6' }
+};
+
+function formatClock(timestamp) {
+    const d = new Date(timestamp);
+    const hrs = d.getHours().toString().padStart(2, '0');
+    const mins = d.getMinutes().toString().padStart(2, '0');
+    const secs = d.getSeconds().toString().padStart(2, '0');
+    return `${hrs}:${mins}:${secs}`;
+}
+
+function hexToRgba(hex, alpha) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 export function updateHealthCard(parameter, data) {
@@ -131,11 +147,160 @@ export function updateAlerts(alerts) {
 }
 
 export function updateSimulationModeButtons(mode) {
-    const normalBtn = document.getElementById('normal-mode');
-    const warningBtn = document.getElementById('warning-mode');
-    const criticalBtn = document.getElementById('critical-mode');
+    const buttons = {
+        NORMAL: document.getElementById('normal-mode'),
+        WARNING: document.getElementById('warning-mode'),
+        CRITICAL: document.getElementById('critical-mode')
+    };
 
-    if (normalBtn) normalBtn.style.borderColor = mode === 'NORMAL' ? '#38BDF8' : 'transparent';
-    if (warningBtn) warningBtn.style.borderColor = mode === 'WARNING' ? '#38BDF8' : 'transparent';
-    if (criticalBtn) criticalBtn.style.borderColor = mode === 'CRITICAL' ? '#38BDF8' : 'transparent';
+    Object.keys(buttons).forEach(key => {
+        const btn = buttons[key];
+        if (!btn) {
+            return;
+        }
+        const isActive = key === mode;
+        btn.classList.toggle('is-active', isActive);
+        btn.setAttribute('aria-pressed', String(isActive));
+        btn.style.borderColor = isActive ? '#38BDF8' : 'transparent';
+    });
+}
+
+/* Health History Chart */
+
+let historyChart = null;
+
+function buildChartData(history, parameter) {
+    const meta = PARAMETER_META[parameter] || PARAMETER_META.heartRate;
+    const series = (history && history[parameter]) ? history[parameter] : [];
+
+    return {
+        labels: series.map(reading => formatClock(reading.timestamp)),
+        datasets: [{
+            label: `${meta.label} (${meta.unit})`,
+            data: series.map(reading => reading.value),
+            borderColor: meta.color,
+            backgroundColor: hexToRgba(meta.color, 0.12),
+            borderWidth: 2,
+            tension: 0.35,
+            pointRadius: 2,
+            pointHoverRadius: 5,
+            pointBackgroundColor: meta.color,
+            fill: true
+        }]
+    };
+}
+
+function buildChartOptions(parameter) {
+    const meta = PARAMETER_META[parameter] || PARAMETER_META.heartRate;
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 400 },
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: '#0D1B2A',
+                borderColor: '#14263A',
+                borderWidth: 1,
+                titleColor: '#94A3B8',
+                bodyColor: '#F8FAFC',
+                padding: 10,
+                callbacks: {
+                    title: (items) => (items.length ? `Time: ${items[0].label}` : ''),
+                    label: (context) => `${meta.label}: ${context.parsed.y} ${meta.unit}`
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: { color: 'rgba(148, 163, 184, 0.08)' },
+                ticks: { color: '#94A3B8', maxTicksLimit: 6, font: { size: 11 } }
+            },
+            y: {
+                grid: { color: 'rgba(148, 163, 184, 0.08)' },
+                ticks: { color: '#94A3B8', font: { size: 11 } },
+                title: { display: true, text: meta.unit, color: '#94A3B8', font: { size: 11 } }
+            }
+        }
+    };
+}
+
+function setChartVisibility(history, parameter) {
+    const canvas = document.getElementById('health-history-chart');
+    const empty = document.getElementById('chart-empty');
+    const series = (history && history[parameter]) ? history[parameter] : [];
+    const hasData = series.length > 0;
+    const canRender = typeof Chart !== 'undefined';
+
+    if (canvas) {
+        canvas.hidden = !hasData || !canRender;
+    }
+    if (empty) {
+        empty.hidden = hasData && canRender;
+    }
+}
+
+function updateChartAccessibility(history, parameter) {
+    const canvas = document.getElementById('health-history-chart');
+    const meta = PARAMETER_META[parameter] || PARAMETER_META.heartRate;
+    const series = (history && history[parameter]) ? history[parameter] : [];
+
+    if (canvas) {
+        if (series.length > 0) {
+            const latest = series[series.length - 1];
+            canvas.setAttribute(
+                'aria-label',
+                `${meta.label} history chart. ${series.length} readings. Latest value ${latest.value} ${meta.unit} at ${formatClock(latest.timestamp)}.`
+            );
+        } else {
+            canvas.setAttribute('aria-label', `${meta.label} history chart. No data.`);
+        }
+    }
+}
+
+function updateChartTitle(parameter) {
+    const title = document.getElementById('chart-title');
+    const meta = PARAMETER_META[parameter] || PARAMETER_META.heartRate;
+    if (title) {
+        title.textContent = `${meta.label} — Last 20 Readings`;
+    }
+}
+
+export function initHistoryChart(history, parameter) {
+    const canvas = document.getElementById('health-history-chart');
+
+    setChartVisibility(history, parameter);
+    updateChartTitle(parameter);
+    updateChartAccessibility(history, parameter);
+
+    if (!canvas || typeof Chart === 'undefined') {
+        return;
+    }
+
+    if (historyChart) {
+        updateHistoryChart(history, parameter);
+        return;
+    }
+
+    historyChart = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: buildChartData(history, parameter),
+        options: buildChartOptions(parameter)
+    });
+}
+
+export function updateHistoryChart(history, parameter) {
+    setChartVisibility(history, parameter);
+    updateChartTitle(parameter);
+    updateChartAccessibility(history, parameter);
+
+    if (!historyChart) {
+        initHistoryChart(history, parameter);
+        return;
+    }
+
+    historyChart.data = buildChartData(history, parameter);
+    historyChart.options = buildChartOptions(parameter);
+    historyChart.update();
 }

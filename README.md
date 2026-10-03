@@ -8,7 +8,7 @@ AstroPulse is a frontend-only simulation of an astronaut health monitoring syste
 
 ## Status
 
-Phase 4 — Health Logic & Live Monitoring (Stabilized)
+Phase 5 — Health History & Final Integration
 
 ## Features
 
@@ -18,10 +18,11 @@ Phase 4 — Health Logic & Live Monitoring (Stabilized)
 - **Overall Health Assessment**: Priority-based overall status (CRITICAL > WARNING > NORMAL)
 - **Alert System**: Parameter-specific alerts with proper transition handling and recovery
 - **Live Monitoring**: Health data updates every 5 seconds with smooth, realistic variation
+- **Health History Chart**: Line chart of the last 20 readings with a parameter selector for all five health metrics
 - **Mission Clock**: Simulated mission time (Mission Day 47, UTC) updating every second
 - **Simulation Controls**: Demonstration modes (NORMAL, WARNING, CRITICAL) for testing scenarios
 - **Responsive Design**: Works across desktop, tablet, and mobile devices
-- **Accessible UI**: Semantic HTML, ARIA labels, keyboard accessible controls
+- **Accessible UI**: Semantic HTML, ARIA labels, keyboard accessible controls and charts
 
 ## Project Structure
 
@@ -47,17 +48,40 @@ AstroPulse/
 
 ## How to Run
 
-1. Open `index.html` in a modern web browser (Chrome, Firefox, Safari, Edge)
-2. The dashboard will initialize automatically with live simulation
-3. Use the simulation controls (NORMAL/WARNING/CRITICAL) to test different scenarios
-4. Monitor real-time health updates and alerts
+AstroPulse uses native ES modules, so it must be served over HTTP (opening `index.html` directly with a `file://` URL will not work because browsers block ES module imports from the local filesystem). There is no build step or install step.
+
+Pick one of these options from the project folder:
+
+```bash
+# Python 3 (already installed on most systems)
+python -m http.server 8000
+
+# or Node.js
+npx serve .
+
+# or PHP
+php -S localhost:8000
+```
+
+Then open `http://localhost:8000/` in a modern browser (Chrome, Firefox, Safari, Edge).
+
+If you use VS Code, the **Live Server** extension works as well (right-click `index.html` → "Open with Live Server").
+
+1. The dashboard initializes automatically with live simulation
+2. Use the simulation controls (NORMAL/WARNING/CRITICAL) to test different scenarios
+3. Monitor real-time health updates and alerts
+4. Switch the chart's parameter selector to view history for any of the five health metrics
+
+> **Notes:**
+> - The health history chart loads Chart.js from a CDN and requires an internet connection. Without it, the dashboard still runs and the chart shows its "No historical readings available." empty state.
+> - A local server is required only because of ES modules; all application logic runs entirely in the browser with no backend.
 
 ## Architecture
 
 - **Data Layer** (`healthData.js`): Generates realistic simulated health data with smooth variation, validation, and rolling 20-reading history
 - **Logic Layer** (`healthLogic.js`): Centralized thresholds, status evaluation, overall health calculation, and alert generation
-- **UI Layer** (`ui.js`): Targeted DOM updates for health cards, overall status, alerts, mission clock, and controls
-- **Application Layer** (`app.js`): Orchestrates all modules, manages application state, and handles timers
+- **UI Layer** (`ui.js`): Targeted DOM updates for health cards, overall status, alerts, mission clock, controls, and the history chart
+- **Application Layer** (`app.js`): Orchestrates all modules, manages application state, handles timers, and coordinates chart updates
 
 ## Health Parameters & Thresholds (Simulation)
 
@@ -77,6 +101,11 @@ AstroPulse/
 - Phase 2: UI design & responsive CSS ✓  
 - Phase 3: Health data engine ✓
 - Phase 4: Health logic & live monitoring (stabilized) ✓
+- Phase 5: Health history chart & final integration ✓
+
+## Dependencies
+
+- [Chart.js](https://www.chartjs.org/) v4 (loaded via CDN) — used only for the health history line chart. No package manager, build step, or bundler is required.
 
 ## Disclaimer
 

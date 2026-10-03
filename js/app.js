@@ -1,4 +1,4 @@
-// AstroPulse - Phase 4: Application Controller
+// AstroPulse - Phase 4/5: Application Controller
 // Coordinates health data, logic, and UI
 
 import {
@@ -21,7 +21,9 @@ import {
     updateOverallHealth,
     updateMissionTime,
     updateAlerts,
-    updateSimulationModeButtons
+    updateSimulationModeButtons,
+    initHistoryChart,
+    updateHistoryChart
 } from './ui.js';
 
 const appState = {
@@ -33,6 +35,7 @@ const appState = {
     missionStartDay: 47,
     missionTotalSeconds: 14 * 3600 + 32 * 60 + 18,
     simulationMode: 'NORMAL',
+    selectedParameter: 'heartRate',
     healthUpdateTimer: null,
     missionClockTimer: null
 };
@@ -46,8 +49,10 @@ function initializeApp() {
     appState.activeAlerts = {};
 
     updateUI();
+    initHistoryChart(appState.history, appState.selectedParameter);
     startTimers();
     setupSimulationControls();
+    setupChartControls();
 }
 
 function updateUI() {
@@ -64,6 +69,20 @@ function updateUI() {
     updateMissionTime(appState.missionStartDay, appState.missionTotalSeconds);
     updateAlerts(appState.alerts);
     updateSimulationModeButtons(appState.simulationMode);
+    updateHistoryChart(appState.history, appState.selectedParameter);
+}
+
+function setupChartControls() {
+    const selector = document.getElementById('history-parameter');
+    if (!selector) {
+        return;
+    }
+
+    selector.value = appState.selectedParameter;
+    selector.addEventListener('change', (event) => {
+        appState.selectedParameter = event.target.value;
+        updateHistoryChart(appState.history, appState.selectedParameter);
+    });
 }
 
 function updateHealth() {
@@ -72,9 +91,9 @@ function updateHealth() {
     if (appState.simulationMode === 'NORMAL') {
         nextData = generateNextHealthData(appState.healthData);
     } else if (appState.simulationMode === 'WARNING') {
-        nextData = generateWarningModeData(appState.healthData);
+        nextData = generateWarningModeData();
     } else if (appState.simulationMode === 'CRITICAL') {
-        nextData = generateCriticalModeData(appState.healthData);
+        nextData = generateCriticalModeData();
     } else {
         nextData = generateNextHealthData(appState.healthData);
     }
@@ -91,8 +110,7 @@ function updateHealth() {
     updateUI();
 }
 
-function generateWarningModeData(previousData) {
-    const base = previousData || getInitialHealthData();
+function generateWarningModeData() {
     return {
         heartRate: 112,
         oxygen: 94,
@@ -102,8 +120,7 @@ function generateWarningModeData(previousData) {
     };
 }
 
-function generateCriticalModeData(previousData) {
-    const base = previousData || getInitialHealthData();
+function generateCriticalModeData() {
     return {
         heartRate: 128,
         oxygen: 87,
@@ -125,17 +142,9 @@ function processAlerts(evaluation) {
     params.forEach(param => {
         const evalData = evaluation[param];
         if (evalData && (evalData.status === STATUS.WARNING || evalData.status === STATUS.CRITICAL)) {
-            const prevStatus = appState.activeAlerts[param];
-            if (prevStatus !== evalData.status) {
-                const alert = generateAlert(param, evalData.value, evalData.status);
-                if (alert) {
-                    newAlerts.push(alert);
-                }
-            } else {
-                const alert = generateAlert(param, evalData.value, evalData.status);
-                if (alert) {
-                    newAlerts.push(alert);
-                }
+            const alert = generateAlert(param, evalData.value, evalData.status);
+            if (alert) {
+                newAlerts.push(alert);
             }
             newActive[param] = evalData.status;
         }
@@ -172,50 +181,30 @@ function setupSimulationControls() {
     const criticalBtn = document.getElementById('critical-mode');
 
     if (normalBtn) {
-        normalBtn.addEventListener('click', () => {
-            appState.simulationMode = 'NORMAL';
-            appState.healthData = getInitialHealthData();
-            appState.healthEvaluation = evaluateHealthData(appState.healthData);
-            appState.overallStatus = calculateOverallStatus(appState.healthEvaluation);
-            appState.alerts = [];
-            appState.activeAlerts = {};
-            if (validateHealthData(appState.healthData)) {
-                addToHistory(appState.history, appState.healthData);
-            }
-            updateSimulationModeButtons(appState.simulationMode);
-            updateUI();
-        });
+        normalBtn.addEventListener('click', () => applySimulationMode('NORMAL', getInitialHealthData()));
     }
     if (warningBtn) {
-        warningBtn.addEventListener('click', () => {
-            appState.simulationMode = 'WARNING';
-            appState.healthData = generateWarningModeData(appState.healthData);
-            appState.healthEvaluation = evaluateHealthData(appState.healthData);
-            appState.overallStatus = calculateOverallStatus(appState.healthEvaluation);
-            appState.alerts = [];
-            appState.activeAlerts = {};
-            if (validateHealthData(appState.healthData)) {
-                addToHistory(appState.history, appState.healthData);
-            }
-            updateSimulationModeButtons(appState.simulationMode);
-            updateUI();
-        });
+        warningBtn.addEventListener('click', () => applySimulationMode('WARNING', generateWarningModeData()));
     }
     if (criticalBtn) {
-        criticalBtn.addEventListener('click', () => {
-            appState.simulationMode = 'CRITICAL';
-            appState.healthData = generateCriticalModeData(appState.healthData);
-            appState.healthEvaluation = evaluateHealthData(appState.healthData);
-            appState.overallStatus = calculateOverallStatus(appState.healthEvaluation);
-            appState.alerts = [];
-            appState.activeAlerts = {};
-            if (validateHealthData(appState.healthData)) {
-                addToHistory(appState.history, appState.healthData);
-            }
-            updateSimulationModeButtons(appState.simulationMode);
-            updateUI();
-        });
+        criticalBtn.addEventListener('click', () => applySimulationMode('CRITICAL', generateCriticalModeData()));
     }
+}
+
+function applySimulationMode(mode, data) {
+    appState.simulationMode = mode;
+    appState.healthData = data;
+    appState.healthEvaluation = evaluateHealthData(appState.healthData);
+    appState.overallStatus = calculateOverallStatus(appState.healthEvaluation);
+    appState.activeAlerts = {};
+
+    if (validateHealthData(appState.healthData)) {
+        addToHistory(appState.history, appState.healthData);
+    }
+
+    processAlerts(appState.healthEvaluation);
+    updateSimulationModeButtons(appState.simulationMode);
+    updateUI();
 }
 
 if (document.readyState === 'loading') {
