@@ -138,23 +138,50 @@ export function generateAlert(parameter, value, status) {
         exercise: 'Exercise Time'
     };
 
+    const units = {
+        heartRate: 'BPM',
+        oxygen: '%',
+        temperature: '°C',
+        sleep: 'hours',
+        exercise: 'minutes'
+    };
+
     const name = paramNames[parameter] || parameter;
+    const unit = units[parameter] || '';
 
     if (status === STATUS.CRITICAL) {
+        if (parameter === 'oxygen' || parameter === 'sleep' || parameter === 'exercise') {
+            return {
+                type: STATUS.CRITICAL,
+                parameter,
+                message: `CRITICAL: ${name} is critically low — ${value} ${unit}`,
+                value,
+                timestamp: Date.now()
+            };
+        }
         return {
             type: STATUS.CRITICAL,
             parameter,
-            message: `CRITICAL ALERT: ${name} is critically low/high`,
+            message: `CRITICAL: ${name} is critically high — ${value} ${unit}`,
             value,
             timestamp: Date.now()
         };
     }
 
     if (status === STATUS.WARNING) {
+        if (parameter === 'oxygen' || parameter === 'sleep' || parameter === 'exercise') {
+            return {
+                type: STATUS.WARNING,
+                parameter,
+                message: `WARNING: ${name} is low — ${value} ${unit}`,
+                value,
+                timestamp: Date.now()
+            };
+        }
         return {
             type: STATUS.WARNING,
             parameter,
-            message: `WARNING: ${name} requires attention`,
+            message: `WARNING: ${name} is elevated — ${value} ${unit}`,
             value,
             timestamp: Date.now()
         };

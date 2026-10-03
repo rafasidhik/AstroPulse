@@ -131,6 +131,11 @@ function processAlerts(evaluation) {
                 if (alert) {
                     newAlerts.push(alert);
                 }
+            } else {
+                const alert = generateAlert(param, evalData.value, evalData.status);
+                if (alert) {
+                    newAlerts.push(alert);
+                }
             }
             newActive[param] = evalData.status;
         }
@@ -169,25 +174,46 @@ function setupSimulationControls() {
     if (normalBtn) {
         normalBtn.addEventListener('click', () => {
             appState.simulationMode = 'NORMAL';
+            appState.healthData = getInitialHealthData();
+            appState.healthEvaluation = evaluateHealthData(appState.healthData);
+            appState.overallStatus = calculateOverallStatus(appState.healthEvaluation);
             appState.alerts = [];
             appState.activeAlerts = {};
+            if (validateHealthData(appState.healthData)) {
+                addToHistory(appState.history, appState.healthData);
+            }
             updateSimulationModeButtons(appState.simulationMode);
+            updateUI();
         });
     }
     if (warningBtn) {
         warningBtn.addEventListener('click', () => {
             appState.simulationMode = 'WARNING';
+            appState.healthData = generateWarningModeData(appState.healthData);
+            appState.healthEvaluation = evaluateHealthData(appState.healthData);
+            appState.overallStatus = calculateOverallStatus(appState.healthEvaluation);
             appState.alerts = [];
             appState.activeAlerts = {};
+            if (validateHealthData(appState.healthData)) {
+                addToHistory(appState.history, appState.healthData);
+            }
             updateSimulationModeButtons(appState.simulationMode);
+            updateUI();
         });
     }
     if (criticalBtn) {
         criticalBtn.addEventListener('click', () => {
             appState.simulationMode = 'CRITICAL';
+            appState.healthData = generateCriticalModeData(appState.healthData);
+            appState.healthEvaluation = evaluateHealthData(appState.healthData);
+            appState.overallStatus = calculateOverallStatus(appState.healthEvaluation);
             appState.alerts = [];
             appState.activeAlerts = {};
+            if (validateHealthData(appState.healthData)) {
+                addToHistory(appState.history, appState.healthData);
+            }
             updateSimulationModeButtons(appState.simulationMode);
+            updateUI();
         });
     }
 }
